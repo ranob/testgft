@@ -60,7 +60,7 @@ public class PriceE2ETest {
     }
 
     @Test
-    @DisplayName("Test 2: Request at 16:00 on day 14 should return price 25.45")
+    @DisplayName("Test 2: Request at 16:00 on day 14 should return price 25.45 beacause of priority")
     void test2_4pm_day14() {
         performTest("2020-06-14T16:00:00", 25.45f, 2);
     }
@@ -81,6 +81,36 @@ public class PriceE2ETest {
     @DisplayName("Test 5: Request at 21:00 on day 16 should return price 38.95")
     void test5_9pm_day16() {
         performTest("2020-06-16T21:00:00", 38.95f, 4);
+    }
+
+    @Test
+    @DisplayName("Should return 404 Not Found when no price is applicable")
+    void testNotFoundWhenNoPriceMatches() {
+        given()
+            .queryParam("applicationDate", "2023-01-01T10:00:00") // A date with no matching price
+            .queryParam("productId", 99999L) // A product ID that doesn't exist
+            .queryParam("brandId", BRAND_ID)
+        .when()
+            .get(BASE_URL)
+        .then()
+            .statusCode(HttpStatus.NOT_FOUND.value());
+    }
+
+    @Test
+    @DisplayName("Should return 400 Bad Request for invalid parameter type")
+    void testBadRequestForInvalidParameterType() {
+        String invalidProductId = "not-a-number";
+        String expectedErrorMessage = String.format("El parametro 'productId' debe ser de tipo 'Long' pero el valor fue: '%s'", invalidProductId);
+
+        given()
+            .queryParam("applicationDate", "2020-06-14T10:00:00")
+            .queryParam("productId", invalidProductId) // Invalid type
+            .queryParam("brandId", BRAND_ID)
+        .when()
+            .get(BASE_URL)
+        .then()
+            .statusCode(HttpStatus.BAD_REQUEST.value())
+            .body("error", equalTo(expectedErrorMessage));
     }
 }
 

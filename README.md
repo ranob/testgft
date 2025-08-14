@@ -1,6 +1,6 @@
 # Price Service - Inditex Tech Test
 
-[![Java CI with Maven](https://github.com/ranob/testgft/actions/workflows/build.yml/badge.svg)](https://github.com/ranob/testgft/actions/workflows/build.yml)
+[![Java CI with Maven](https://github.com/YOUR_USERNAME/YOUR_REPOSITORY/actions/workflows/build.yml/badge.svg)](https://github.com/YOUR_USERNAME/YOUR_REPOSITORY/actions/workflows/build.yml)
 
 This project implements a REST service to query product prices, following the requirements of the Inditex technical test.
 
@@ -10,8 +10,6 @@ This project implements a REST service to query product prices, following the re
     * **`domain`**: A module containing pure business logic with no framework dependencies. Its `pom.xml` forbids coupling with the infrastructure.
     * **`application`**: A module that orchestrates use cases and handles framework responsibilities like transactions. It depends on `domain`.
     * **`infrastructure`**: A module containing the Spring Boot application, web (REST) and persistence (JPA) adapters, and the executable entry point. It depends on `application`.
-
-* **JDK 21 & Virtual Threads**: The service is built on JDK 21 to leverage its modern features. Project Loom's **Virtual Threads** have been enabled via Spring Boot's configuration. This decision was made because the application is primarily **I/O-bound** (limited by database waits). Virtual threads allow for much higher scalability and better system resource utilization under high concurrency.
 
 * **Comprehensive Testing Strategy**: A robust testing pyramid has been implemented:
     * **Unit Tests (Domain & Application)**: Pure tests (with and without Mockito) to verify business logic and orchestration in isolation.
@@ -42,7 +40,7 @@ This project implements a REST service to query product prices, following the re
     ```bash
     java -jar infrastructure/target/infrastructure-0.0.1-SNAPSHOT.jar
     ```
-    The service will start on `http://localhost:8080`.
+    The service will start on `http://localhost:9090`.
 
 ## How to Run Tests
 
@@ -51,15 +49,43 @@ To run the full test suite for all modules:
 mvn test
 ```
 
-## API Request Example
+## API Request Examples
 
-Once the application is running, you can use `curl` to test the endpoint:
+Once the application is running, you can use `curl` to test the 5 required validation cases:
 
-```bash
-curl 'http://localhost:8080/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=35455&brandId=1'
-```
+* **Test 1:** Request at 10:00 on day 14
+    ```bash
+    curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=35455&brandId=1'
+    ```
+
+* **Test 2:** Request at 16:00 on day 14
+    ```bash
+    curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T16:00:00&productId=35455&brandId=1'
+    ```
+
+* **Test 3:** Request at 21:00 on day 14
+    ```bash
+    curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T21:00:00&productId=35455&brandId=1'
+    ```
+
+* **Test 4:** Request at 10:00 on day 15
+    ```bash
+    curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-15T10:00:00&productId=35455&brandId=1'
+    ```
+
+* **Test 5:** Request at 21:00 on day 16
+    ```bash
+    curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-16T21:00:00&productId=35455&brandId=1'
+    ```
 
 ## Exception Handling
 
-* **Price not found**: The service returns a `404 Not Found`.
-* **Incorrect parameters**: The service returns a `400 Bad Request` with a descriptive JSON message (e.g., if `productId` is not a number).
+* **Price not found (404)**: The service returns a `404 Not Found`. To test this, use parameters that won't match any data:
+    ```bash
+    curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2023-01-01T10:00:00&productId=99999&brandId=1'
+    ```
+
+* **Incorrect parameters (400)**: The service returns a `400 Bad Request` with a descriptive JSON message. To test this, use an invalid data type for a parameter:
+    ```bash
+    curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=not-a-number&brandId=1'
+    
