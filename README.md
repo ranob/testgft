@@ -51,32 +51,99 @@ mvn test
 
 ## API Request Examples
 
-Once the application is running, you can use `curl` to test the 5 required validation cases:
+The following `curl` commands test the required validation cases. The tests are based on the following sample data set, which is loaded into the in-memory database at startup:
+
+| BRAND_ID | START_DATE          | END_DATE            | PRICE_LIST | PRODUCT_ID | PRIORITY | PRICE | CURR |
+|----------|---------------------|---------------------|------------|------------|----------|-------|------|
+| 1        | 2020-06-14 00:00:00 | 2020-12-31 23:59:59 | 1          | 35455      | 0        | 35.50 | EUR  |
+| 1        | 2020-06-14 15:00:00 | 2020-06-14 18:30:00 | 2          | 35455      | 1        | 25.45 | EUR  |
+| 1        | 2020-06-15 00:00:00 | 2020-06-15 11:00:00 | 3          | 35455      | 1        | 30.50 | EUR  |
+| 1        | 2020-06-15 16:00:00 | 2020-12-31 23:59:59 | 4          | 35455      | 1        | 38.95 | EUR  |
 
 ### Test 1: Request at 10:00 on day 14
 ```bash
 curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=35455&brandId=1'
 ```
+* **Expected Result:**
+    ```json
+    {
+        "productId": 35455,
+        "brandId": 1,
+        "priceList": 1,
+        "startDate": "2020-06-14T00:00:00",
+        "endDate": "2020-12-31T23:59:59",
+        "finalPrice": 35.50
+    }
+    ```
+* **Reason:** At this time, only price list 1 (priority 0) is active.
 
 ### Test 2: Request at 16:00 on day 14
 ```bash
 curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T16:00:00&productId=35455&brandId=1'
 ```
+* **Expected Result:**
+    ```json
+    {
+        "productId": 35455,
+        "brandId": 1,
+        "priceList": 2,
+        "startDate": "2020-06-14T15:00:00",
+        "endDate": "2020-06-14T18:30:00",
+        "finalPrice": 25.45
+    }
+    ```
+* **Reason:** Two price lists are active (1 and 2). List 2 is applied due to its higher priority (1 > 0).
 
 ### Test 3: Request at 21:00 on day 14
 ```bash
 curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T21:00:00&productId=35455&brandId=1'
 ```
+* **Expected Result:**
+    ```json
+    {
+        "productId": 35455,
+        "brandId": 1,
+        "priceList": 1,
+        "startDate": "2020-06-14T00:00:00",
+        "endDate": "2020-12-31T23:59:59",
+        "finalPrice": 35.50
+    }
+    ```
+* **Reason:** Price list 2 is no longer active. The only applicable list is 1.
 
 ### Test 4: Request at 10:00 on day 15
 ```bash
 curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-15T10:00:00&productId=35455&brandId=1'
 ```
+* **Expected Result:**
+    ```json
+    {
+        "productId": 35455,
+        "brandId": 1,
+        "priceList": 3,
+        "startDate": "2020-06-15T00:00:00",
+        "endDate": "2020-06-15T11:00:00",
+        "finalPrice": 30.50
+    }
+    ```
+* **Reason:** Two price lists are active (1 and 3). List 3 is applied due to its higher priority (1 > 0).
 
 ### Test 5: Request at 21:00 on day 16
 ```bash
 curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-16T21:00:00&productId=35455&brandId=1'
 ```
+* **Expected Result:**
+    ```json
+    {
+        "productId": 35455,
+        "brandId": 1,
+        "priceList": 4,
+        "startDate": "2020-06-15T16:00:00",
+        "endDate": "2020-12-31T23:59:59",
+        "finalPrice": 38.95
+    }
+    ```
+* **Reason:** Two price lists are active (1 and 4). List 4 is applied due to its higher priority (1 > 0).
 
 ## Exception Handling
 
@@ -85,8 +152,16 @@ The service returns a `404 Not Found`. To test this, use parameters that won't m
 ```bash
 curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2023-01-01T10:00:00&productId=99999&brandId=1'
 ```
+* **Expected Result:** An `HTTP/1.1 404 Not Found` status code with no response body.
+* **Reason:** No price list in the database matches the request criteria.
 
 ### Incorrect parameters (400)
 The service returns a `400 Bad Request` with a descriptive JSON message. To test this, use an invalid data type for a parameter:
 ```bash
 curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=not-a-number&brandId=1'
+```
+* **Expected Result:** An `HTTP/1.1 400 Bad Request` status code with a JSON body similar to this:
+    ```json
+    {"error":"El parametro 'productId' debe ser de tipo 'Long' pero el valor fue: 'not-a-number'"}
+    ```
+* **Reason:** The `GlobalExceptionHandler` catches the type conversion error and returns a controlled response.
