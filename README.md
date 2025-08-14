@@ -7,14 +7,16 @@ This project implements a REST service to query product prices, following the re
 ## Key Design and Technology Decisions
 
 * **Multi-Module Hexagonal Architecture**: The project is built following the principles of **Hexagonal Architecture (Ports and Adapters)**. To enforce this pattern and ensure strict decoupling, the architecture has been implemented in a **multi-module Maven structure**:
-    * **`domain`**: A module containing pure business logic with no framework dependencies. Its `pom.xml` forbids coupling with the infrastructure.
-    * **`application`**: A module that orchestrates use cases and handles framework responsibilities like transactions. It depends on `domain`.
-    * **`infrastructure`**: A module containing the Spring Boot application, web (REST) and persistence (JPA) adapters, and the executable entry point. It depends on `application`.
+    * **`domain`**: A module containing pure business logic with no framework dependencies.
+    * **`application`**: A module that orchestrates use cases and handles framework responsibilities like transactions.
+    * **`infrastructure`**: A module containing the Spring Boot application, web (REST) and persistence (JPA) adapters.
+
+* **Manual DTO/Entity Mapping**: For object mapping between layers (e.g., Entity to Domain, Domain to DTO), manual mapping was chosen over libraries like MapStruct. Given the simplicity of the models in this project, manual mapping is more direct, avoids extra dependencies, and adheres to the principle of keeping the solution minimal, as requested.
 
 * **Comprehensive Testing Strategy**: A robust testing pyramid has been implemented:
-    * **Unit Tests (Domain & Application)**: Pure tests (with and without Mockito) to verify business logic and orchestration in isolation.
-    * **Slice Tests (Infrastructure)**: Tests using `@WebMvcTest` and `@DataJpaTest` to verify adapters (Controller, Repository) independently.
-    * **End-to-End Tests (Infrastructure)**: Tests with RestAssured that start the full application and validate the 5 required use cases through real HTTP requests.
+    * **Unit Tests**: To verify business logic and component behavior in isolation.
+    * **Slice Tests**: Using `@WebMvcTest` and `@DataJpaTest` to verify web and persistence adapters independently.
+    * **End-to-End Tests**: Using RestAssured to validate the 5 required use cases through real HTTP requests.
 
 ## Prerequisites
 
@@ -33,10 +35,8 @@ This project implements a REST service to query product prices, following the re
     ```bash
     mvn clean install
     ```
-    This command will compile and test all modules in the correct order.
 
 3.  **Run the application:**
-    The executable JAR is generated in the `infrastructure` module.
     ```bash
     java -jar infrastructure/target/infrastructure-0.0.1-SNAPSHOT.jar
     ```
@@ -50,8 +50,6 @@ mvn test
 ```
 
 ## API Request Examples
-
-Once the application is running, you can use `curl` to test the 5 required validation cases:
 
 * **Test 1:** Request at 10:00 on day 14
     ```bash
@@ -80,12 +78,12 @@ Once the application is running, you can use `curl` to test the 5 required valid
 
 ## Exception Handling
 
-* **Price not found (404)**: The service returns a `404 Not Found`. To test this, use parameters that won't match any data:
+* **Price not found (404)**:
     ```bash
     curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2023-01-01T10:00:00&productId=99999&brandId=1'
     ```
 
-* **Incorrect parameters (400)**: The service returns a `400 Bad Request` with a descriptive JSON message. To test this, use an invalid data type for a parameter:
+* **Incorrect parameters (400)**:
     ```bash
     curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=not-a-number&brandId=1'
     
