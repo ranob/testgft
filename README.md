@@ -11,7 +11,7 @@ This project implements a REST service to query product prices, following the re
     * **`application`**: A module that orchestrates use cases and handles framework responsibilities like transactions.
     * **`infrastructure`**: A module containing the Spring Boot application, web (REST) and persistence (JPA) adapters.
 
-* **Manual DTO/Entity Mapping**: For object mapping between layers (e.g., Entity to Domain, Domain to DTO), manual mapping was chosen over libraries like MapStruct. Given the simplicity of the models in this project, manual mapping is more direct, avoids extra dependencies, and adheres to the principle of keeping the solution minimal, as requested.
+* **Manual DTO/Entity Mapping**: Manual mapping was used for converting objects between layers (e.g., Entity to Domain, Domain to DTO) due to the simplicity of this example. For real-world, more complex projects, using a dedicated mapping library like MapStruct would be the recommended approach to ensure type safety and reduce boilerplate code.
 
 * **Comprehensive Testing Strategy**: A robust testing pyramid has been implemented:
     * **Unit Tests**: To verify business logic and component behavior in isolation.
@@ -47,43 +47,10 @@ This project implements a REST service to query product prices, following the re
 To run the full test suite for all modules:
 ```bash
 mvn test
-```
-
-## API Request Examples
-
-* **Test 1:** Request at 10:00 on day 14
-    ```bash
-    curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=35455&brandId=1'
-    ```
-
-* **Test 2:** Request at 16:00 on day 14
-    ```bash
-    curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T16:00:00&productId=35455&brandId=1'
-    ```
-
-* **Test 3:** Request at 21:00 on day 14
-    ```bash
-    curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T21:00:00&productId=35455&brandId=1'
-    ```
-
-* **Test 4:** Request at 10:00 on day 15
-    ```bash
-    curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-15T10:00:00&productId=35455&brandId=1'
-    ```
-
-* **Test 5:** Request at 21:00 on day 16
-    ```bash
-    curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-16T21:00:00&productId=35455&brandId=1'
-    ```
-
-## Exception Handling
-
-* **Price not found (404)**:
-    ```bash
-    curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2023-01-01T10:00:00&productId=99999&brandId=1'
-    ```
-
-* **Incorrect parameters (400)**:
-    ```bash
-    curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=not-a-number&brandId=1'
-    
+API Request ExamplesTest 1: Request at 10:00 on day 14curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=35455&brandId=1'
+Test 2: Request at 16:00 on day 14curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T16:00:00&productId=35455&brandId=1'
+Test 3: Request at 21:00 on day 14curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T21:00:00&productId=35455&brandId=1'
+Test 4: Request at 10:00 on day 15curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-15T10:00:00&productId=35455&brandId=1'
+Test 5: Request at 21:00 on day 16curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-16T21:00:00&productId=35455&brandId=1'
+Exception HandlingPrice not found (404):curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2023-01-01T10:00:00&productId=99999&brandId=1'
+Incorrect parameters (400):curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=not-a-number&brandId=1'
