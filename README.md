@@ -11,6 +11,8 @@ This project implements a REST service to query product prices, following the re
     * **`application`**: A module that orchestrates use cases and handles framework responsibilities like transactions.
     * **`infrastructure`**: A module containing the Spring Boot application, web (REST) and persistence (JPA) adapters.
 
+* **Centralized Dependency Management**: The parent `pom.xml` uses the `<dependencyManagement>` section to define and centralize the versions of all libraries. This ensures that all child modules use consistent and compatible dependency versions, preventing conflicts and improving maintainability. Child modules can then declare a dependency without specifying a version, inheriting the one defined in the parent.
+
 * **Manual DTO/Entity Mapping**: Manual mapping was used for converting objects between layers (e.g., Entity to Domain, Domain to DTO) due to the simplicity of this example. For real-world, more complex projects, using a dedicated mapping library like MapStruct would be the recommended approach to ensure type safety and reduce boilerplate code.
 
 * **Comprehensive Testing Strategy**: A robust testing pyramid has been implemented:
