@@ -15,6 +15,8 @@ This project implements a REST service to query product prices, following the re
 
 * **Manual DTO/Entity Mapping**: Manual mapping was used for converting objects between layers (e.g., Entity to Domain, Domain to DTO) due to the simplicity of this example. For real-world, more complex projects, using a dedicated mapping library like MapStruct would be the recommended approach to ensure type safety and reduce boilerplate code.
 
+* **Structured Logging**: The application uses **SLF4J** for logging. Key events, such as incoming requests, successful responses, and errors, are logged to provide visibility into the application's behavior for monitoring and debugging purposes.
+
 * **Comprehensive Testing Strategy**: A robust testing pyramid has been implemented:
     * **Unit Tests**: To verify business logic and component behavior in isolation.
     * **Slice Tests**: Using `@WebMvcTest` and `@DataJpaTest` to verify web and persistence adapters independently.
