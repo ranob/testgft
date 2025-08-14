@@ -20,6 +20,7 @@ This project implements a REST service to query product prices, following the re
 
 ## Prerequisites
 
+* In-memory H2 Database is used for persistence.
 * JDK 21 or higher.
 * Apache Maven 3.8 or higher.
 
