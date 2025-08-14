@@ -15,7 +15,7 @@ This project implements a REST service to query product prices, following the re
 
 * **Manual DTO/Entity Mapping**: Manual mapping was used for converting objects between layers (e.g., Entity to Domain, Domain to DTO) due to the simplicity of this example. For real-world, more complex projects, using a dedicated mapping library like MapStruct would be the recommended approach to ensure type safety and reduce boilerplate code.
 
-**Interactive API Documentation**: The project includes the **`springdoc-openapi`** library to automatically generate interactive API documentation (Swagger UI) from the code.
+* **Interactive API Documentation**: The project includes the **`springdoc-openapi`** library to automatically generate interactive API documentation (Swagger UI) from the code.
 
 * **Structured Logging**: The application uses **SLF4J** for logging. Key events, such as incoming requests, successful responses, and errors, are logged to provide visibility into the application's behavior for monitoring and debugging purposes.
 
