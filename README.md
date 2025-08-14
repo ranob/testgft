@@ -47,10 +47,46 @@ This project implements a REST service to query product prices, following the re
 To run the full test suite for all modules:
 ```bash
 mvn test
-API Request ExamplesTest 1: Request at 10:00 on day 14curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=35455&brandId=1'
-Test 2: Request at 16:00 on day 14curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T16:00:00&productId=35455&brandId=1'
-Test 3: Request at 21:00 on day 14curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T21:00:00&productId=35455&brandId=1'
-Test 4: Request at 10:00 on day 15curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-15T10:00:00&productId=35455&brandId=1'
-Test 5: Request at 21:00 on day 16curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-16T21:00:00&productId=35455&brandId=1'
-Exception HandlingPrice not found (404):curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2023-01-01T10:00:00&productId=99999&brandId=1'
-Incorrect parameters (400):curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=not-a-number&brandId=1'
+```
+
+## API Request Examples
+
+Once the application is running, you can use `curl` to test the 5 required validation cases:
+
+### Test 1: Request at 10:00 on day 14
+```bash
+curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=35455&brandId=1'
+```
+
+### Test 2: Request at 16:00 on day 14
+```bash
+curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T16:00:00&productId=35455&brandId=1'
+```
+
+### Test 3: Request at 21:00 on day 14
+```bash
+curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T21:00:00&productId=35455&brandId=1'
+```
+
+### Test 4: Request at 10:00 on day 15
+```bash
+curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-15T10:00:00&productId=35455&brandId=1'
+```
+
+### Test 5: Request at 21:00 on day 16
+```bash
+curl 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-16T21:00:00&productId=35455&brandId=1'
+```
+
+## Exception Handling
+
+### Price not found (404)
+The service returns a `404 Not Found`. To test this, use parameters that won't match any data:
+```bash
+curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2023-01-01T10:00:00&productId=99999&brandId=1'
+```
+
+### Incorrect parameters (400)
+The service returns a `400 Bad Request` with a descriptive JSON message. To test this, use an invalid data type for a parameter:
+```bash
+curl -i 'http://localhost:9090/api/prices/applicable?applicationDate=2020-06-14T10:00:00&productId=not-a-number&brandId=1'
